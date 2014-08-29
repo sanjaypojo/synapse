@@ -1,0 +1,17 @@
+{
+  "name": "Synapse",
+  "version": "0.1.0",
+  "description": "",
+  "main": "app.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "NodeJS"
+  ],
+  "author": "Sanjay Guruprasad <sanjay@softrade.in> (http://sanjaypojo.com/)",
+  "license": "none",
+  "dependencies": {
+    "connect": "^3.1.1"
+  }
+}

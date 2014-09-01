@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.coffee",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon src/app.coffee",
+    "test": "mocha --compilers coffee:coffee-script/register --reporter doc > test/testResults.html"
   },
   "keywords": [
     "NodeJS"
@@ -12,6 +13,13 @@
   "author": "Sanjay Guruprasad <sanjay@softrade.in> (http://sanjaypojo.com/)",
   "license": "none",
   "dependencies": {
-    "connect": "^3.1.1"
+    "connect": "^3.1.1",
+    "morgan": "^1.2.3",
+    "quip": "^0.1.2",
+    "rendered": "git://github.com/sanjaypojo/rendered.git"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "request": "^2.40.0"
   }
 }

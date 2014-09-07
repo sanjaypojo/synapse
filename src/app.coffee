@@ -1,21 +1,30 @@
 connect = require 'connect'
 quip = require 'quip'
 morgan = require 'morgan'
-bodyParser = require 'body-parser'
-url = require 'url'
-querystring = require 'querystring'
 request = require 'request'
-# render = require 'rendered'
+render = require 'rendered'
+pr = require 'parse-request'
+qs = require 'querystring'
+DB = require('node-db')
+
+dbSettings =
+  host: 'ec2-54-221-223-92.compute-1.amazonaws.com'
+  port: '5432'
+  database: 'd5dnc8meru1323'
+  user: 'svmqboeffkdmoz'
+  password: 'gCDLIrD11uvHbnLfd3UJjnz8Vm'
+  ssl: true
+
+db = new DB('pg', dbSettings)
+
 
 api =
   key: "635576273227721"
   keySecret: "d87991411aa25c0f8538c6a28c30835a"
   callbackURL: encodeURIComponent "http://localhost:3000/link/callback"
-  scope: encodeURIComponent 'user_friends read_friendlists'
+  scope: encodeURIComponent 'email user_friends read_friendlists'
   token: null
   authCode: null
-
-console.log api
 
 app = connect()
 
@@ -48,39 +57,39 @@ dashboard = () ->
             console.error err
             res.error 'OAuth access token failed'
           console.log 'YYYYYYYYY'
-          bodyObj = querystring.parse body
+          bodyObj = qs.parse body
+          console.log bodyObj
           api.token = bodyObj.access_token
-          console.log api.token
-          displayData(res)
+          displayData res
     else
-      displayData()
+      displayData res
 
 displayData = (res) ->
   console.log 'Almost there!'
   request
-    .get('https://graph.facebook.com/me/taggable_friends?access_token=' + api.token, (err, response, body) ->
+    .get('https://graph.facebook.com/me?access_token=' + api.token, (err, response, body) ->
       if err
         console.error err
         res.error 'Fetch failed'
-      console.log body
-      res.ok body
+      data = JSON.parse body
+      db.query res, 'select * from p_add_or_get_user', [], (err, result) ->
+        if err
+          res.error err
+        console.log result
+        console.log 'Sending response'
+        res.ok body
     )
 
 app
   .use (req, res, next) ->
-    console.log api
     req.on 'data', (data) ->
       if data.length > 5*1000000
         req.connection.destroy()
     next()
   .use morgan('short')
   .use quip
-  .use (req, res, next) ->
-    parsedUrl = url.parse req.url
-    req.query = querystring.parse parsedUrl.query
-    req.pathname = parsedUrl.pathname
-    next()
+  .use pr.url
   .use '/link', fbLogin()
   .use '/dashboard', dashboard()
-  .use (req, res, next) -> res.ok 'Hello :D'
+  .use (req, res, next) -> render.jade res, 'login', {}
   .listen 3000

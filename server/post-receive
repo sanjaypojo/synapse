@@ -1,0 +1,6 @@
+#!/bin/sh
+GIT_WORK_TREE=/home/twiddly/synapse/production git checkout -f
+cd /home/twiddly/synapse/production
+npm install
+forever restartall
+echo "synapse deployed successfully"

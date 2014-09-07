@@ -65,20 +65,24 @@ dashboard = () ->
       displayData res
 
 displayData = (res) ->
-  console.log 'Almost there!'
+  console.log 'Display dashboard started'
   request
-    .get('https://graph.facebook.com/me?access_token=' + api.token, (err, response, body) ->
+    .get 'https://graph.facebook.com/me?access_token=' + api.token, (err, response, body) ->
       if err
         console.error err
         res.error 'Fetch failed'
       data = JSON.parse body
-      db.query res, 'select * from p_add_or_get_user', [], (err, result) ->
-        if err
-          res.error err
-        console.log result
-        console.log 'Sending response'
-        res.ok body
-    )
+      console.log data
+      db.query(
+        res, 'select * from p_add_or_get_user($1, $2, $3, $4, $5, $6)',
+        [data.email, data.first_name, data.last_name, data.id, data.gender, data.timezone],
+        (err, result) ->
+          if err
+            res.error err
+          console.log result
+          console.log 'Sending response'
+          res.ok "Hi #{data.first_name}, your ID is #{result.rows[0].user_id}"
+      )
 
 app
   .use (req, res, next) ->

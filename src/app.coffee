@@ -5,7 +5,7 @@ request = require 'request'
 render = require 'rendered'
 pr = require 'parse-request'
 qs = require 'querystring'
-DB = require('node-db')
+DB = require 'node-db'
 
 dbSettings =
   host: 'ec2-54-221-223-92.compute-1.amazonaws.com'
@@ -67,9 +67,8 @@ completeLogin = (res) ->
         (err, result) ->
           if err
             res.error err
-          console.log result
           console.log "User logged in with id #{result.rows[0].user_id}"
-          res.ok "Hi #{data.first_name}, your ID is #{result.rows[0].user_id}"
+          render.jade res, 'dashboard', {name: data.first_name}
       )
 
 fbLogin = () ->

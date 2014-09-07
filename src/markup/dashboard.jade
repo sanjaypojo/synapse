@@ -2,7 +2,6 @@ html
   head
     title Twiddly | Next
     link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css")
-    meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
     style.
       .v-offset-0 { margin-top: 2px; }
       .v-offset-1 { margin-top: 5px; }
@@ -15,9 +14,17 @@ html
       .v-offset-8 { margin-top: 100px; }
       .v-offset-9 { margin-top: 150px; }
       body { background-color: #333333; color: #ffffff; }
+    meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
   body
     #wrapper.col-xs-8.col-xs-offset-2.v-offset-8.text-center
       h1 Synapse
-      a(href="/link")
-        div.v-offset-6
-          button.btn.btn-success Login with Facebook
+      h3.v-offset-6.text-center Welcome #{name}, let's unleash the power of your network!
+      form.v-offset-6.text-left(role="form")
+        .form-group
+          label.control-label(for="is-active") Art thou an active scouter?
+          input.form-control#is-active(name="isActive", type="text", placeholder="Maybe...")
+        .form-group
+          label.control-label(for="is-active") Who stole the cookie from the cookie jar?
+          input.form-control#is-active(name="isActive", type="text", placeholder="Ranjan...")
+        .form-group
+          button.btn.btn-success(type="submit") I'm done!

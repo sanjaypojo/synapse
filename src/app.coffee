@@ -28,44 +28,32 @@ api =
 
 app = connect()
 
-fbLogin = () ->
-  return (req, res, next) ->
-    if req.pathname == '/link/callback'
-      api.authCode = req.query.code
-      res.redirect '/dashboard'
-    if api.authCode == null
-      res.redirect(
-        'https://www.facebook.com/dialog/oauth?' +
-        '&client_id=' + api.key +
-        '&response_type=code' +
-        '&redirect_uri=' + api.callbackURL +
-        '&scope=' + api.scope
-      )
+fetchAuthCode = (res) ->
+  res.redirect(
+    'https://www.facebook.com/dialog/oauth?' +
+    '&client_id=' + api.key +
+    '&response_type=code' +
+    '&redirect_uri=' + api.callbackURL +
+    '&scope=' + api.scope
+  )
 
-dashboard = () ->
-  return (req, res, next) ->
-    if api.authCode == null
-      res.redirect '/link'
-    else if api.token == null
-      console.log api.authCode
-      postData ="?code=#{api.authCode}" +
-        "&redirect_uri=#{api.callbackURL}&client_id=#{api.key}&client_secret=#{api.keySecret}"
-        console.log postData
-      request
-        .get 'https://graph.facebook.com/oauth/access_token' + postData, (err, response, body) ->
-          if err
-            console.error err
-            res.error 'OAuth access token failed'
-          console.log 'YYYYYYYYY'
-          bodyObj = qs.parse body
-          console.log bodyObj
-          api.token = bodyObj.access_token
-          displayData res
-    else
-      displayData res
+fetchToken = (callback) ->
+  postData ="?code=#{api.authCode}" +
+    "&redirect_uri=#{api.callbackURL}&client_id=#{api.key}&client_secret=#{api.keySecret}"
+    console.log postData
+  request
+    .get 'https://graph.facebook.com/oauth/access_token' + postData, (err, response, body) ->
+      if err
+        console.error err
+        res.error 'OAuth access token failed'
+      console.log 'YYYYYYYYY'
+      bodyObj = qs.parse body
+      console.log bodyObj
+      api.token = bodyObj.access_token
+      callback()
 
-displayData = (res) ->
-  console.log 'Display dashboard started'
+completeLogin = (res) ->
+  console.log 'Logging user in'
   request
     .get 'https://graph.facebook.com/me?access_token=' + api.token, (err, response, body) ->
       if err
@@ -80,9 +68,28 @@ displayData = (res) ->
           if err
             res.error err
           console.log result
-          console.log 'Sending response'
+          console.log "User logged in with id #{result.rows[0].user_id}"
           res.ok "Hi #{data.first_name}, your ID is #{result.rows[0].user_id}"
       )
+
+fbLogin = () ->
+  return (req, res, next) ->
+    if req.pathname == '/link/callback'
+      api.authCode = req.query.code
+      res.redirect '/dashboard'
+    if api.authCode == null
+      fetchAuthCode res
+    else
+      res.redirect '/dashboard'
+
+dashboard = () ->
+  return (req, res, next) ->
+    if api.authCode == null
+      res.redirect '/link'
+    else if api.token == null
+      fetchToken () -> completeLogin res
+    else
+      completeLogin res
 
 app
   .use (req, res, next) ->

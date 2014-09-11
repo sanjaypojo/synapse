@@ -19,10 +19,11 @@ db = new DB('pg', dbSettings)
 
 
 api =
-  key: "635576273227721"
-  keySecret: "d87991411aa25c0f8538c6a28c30835a"
+  key: "752ctmqv621kk5"
+  keySecret: "RbsbfFd6UFtJ25bi"
   callbackURL: encodeURIComponent "http://localhost:3000/link/callback"
-  scope: encodeURIComponent 'email user_friends read_friendlists'
+  scope: encodeURIComponent 'r_fullprofile r_network'
+  state: 'dracodormeinsnunquamtitilandus'
   token: null
   authCode: null
 
@@ -30,24 +31,25 @@ app = connect()
 
 fetchAuthCode = (res) ->
   res.redirect(
-    'https://www.facebook.com/dialog/oauth?' +
+    'https://www.linkedin.com/uas/oauth2/authorization?' +
     '&client_id=' + api.key +
     '&response_type=code' +
     '&redirect_uri=' + api.callbackURL +
-    '&scope=' + api.scope
+    '&scope=' + api.scope +
+    '&state=' + api.state
   )
 
 fetchToken = (callback) ->
   postData ="?code=#{api.authCode}" +
-    "&redirect_uri=#{api.callbackURL}&client_id=#{api.key}&client_secret=#{api.keySecret}"
-    console.log postData
+    "&redirect_uri=#{api.callbackURL}&client_id=#{api.key}" +
+    "&client_secret=#{api.keySecret}&grant_type=authorization_code"
   request
-    .get 'https://graph.facebook.com/oauth/access_token' + postData, (err, response, body) ->
+    .get 'https://www.linkedin.com/uas/oauth2/accessToken' + postData, (err, response, body) ->
       if err
         console.error err
         res.error 'OAuth access token failed'
-      console.log 'YYYYYYYYY'
-      bodyObj = qs.parse body
+      console.log 'OAuth user token received'
+      bodyObj = JSON.parse body
       console.log bodyObj
       api.token = bodyObj.access_token
       callback()
@@ -55,21 +57,22 @@ fetchToken = (callback) ->
 completeLogin = (res) ->
   console.log 'Logging user in'
   request
-    .get 'https://graph.facebook.com/me?access_token=' + api.token, (err, response, body) ->
+    .get 'https://api.linkedin.com/v1/people/~/connections?oauth2_access_token=' + api.token, (err, response, body) ->
       if err
         console.error err
         res.error 'Fetch failed'
-      data = JSON.parse body
-      console.log data
-      db.query(
-        res, 'select * from p_add_or_get_user($1, $2, $3, $4, $5, $6)',
-        [data.email, data.first_name, data.last_name, data.id, data.gender, data.timezone],
-        (err, result) ->
-          if err
-            res.error err
-          console.log "User logged in with id #{result.rows[0].user_id}"
-          render.jade res, 'dashboard', {name: data.first_name}
-      )
+      res.ok body
+      # data = JSON.parse body
+      # console.log data
+      # db.query(
+      #   res, 'select * from p_add_or_get_user($1, $2, $3, $4, $5, $6)',
+      #   [data.email, data.first_name, data.last_name, data.id, data.gender, data.timezone],
+      #   (err, result) ->
+      #     if err
+      #       res.error err
+      #     console.log "User logged in with id #{result.rows[0].user_id}"
+      #     render.jade res, 'dashboard', {name: data.first_name}
+      # )
 
 fbLogin = () ->
   return (req, res, next) ->

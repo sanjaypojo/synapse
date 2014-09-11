@@ -6,6 +6,8 @@ render = require 'rendered'
 pr = require 'parse-request'
 qs = require 'querystring'
 DB = require 'node-db'
+xml2js = require 'xml2js'
+xml = new xml2js.Parser()
 
 dbSettings =
   host: 'ec2-54-221-223-92.compute-1.amazonaws.com'
@@ -61,7 +63,9 @@ completeLogin = (res) ->
       if err
         console.error err
         res.error 'Fetch failed'
-      res.ok body
+      xml.parseString body, (err, result) ->
+        console.log result.connections.person
+        render.jade res, 'dashboard', {connections: result.connections.person}
       # data = JSON.parse body
       # console.log data
       # db.query(

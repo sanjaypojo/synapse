@@ -18,7 +18,8 @@
     "node-db": "git://github.com/sanjaypojo/node-db.git",
     "parse-request": "git://github.com/sanjaypojo/parse-request.git",
     "quip": "^0.1.2",
-    "rendered": "git://github.com/sanjaypojo/rendered.git"
+    "rendered": "git://github.com/sanjaypojo/rendered.git",
+    "xml2js": "^0.4.4"
   },
   "devDependencies": {
     "chai": "^1.9.1",

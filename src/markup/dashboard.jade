@@ -21,10 +21,10 @@ html
       h1 Synapse
       .connections.col-xs-12.v-offset-8
         each person in connections
-          if person.headline
-            if person.headline[0].toLowerCase().indexOf("developer") > -1
+          if person.industry
+            if person.industry[0].toLowerCase().indexOf("software") > -1
               .person.col-xs-4
-                .panel.panel-default.col-xs-12(style="min-height: 200px;")
+                .panel.panel-default.col-xs-12(style="min-height: 170px;")
                   .panel-body
                     h3 #{person['first-name']} #{person['last-name']}
                     p #{person.headline}

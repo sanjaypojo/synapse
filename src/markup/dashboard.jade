@@ -15,16 +15,27 @@ html
       .v-offset-9 { margin-top: 150px; }
       body { background-color: #333; color: #fff; }
       .panel-body { color: #333;}
+      .total-connections { position: absolute; top: 15px;}
     meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
   body
-    #wrapper.col-xs-10.col-xs-offset-1.v-offset-8.text-center
+    #wrapper.col-xs-10.col-xs-offset-1.v-offset-6.text-center
       h1 Synapse
-      .connections.col-xs-12.v-offset-8
+      .connections.col-xs-12.v-offset-6
+        - var counter = 0; var hits = 0; var locStyle = 'default';
         each person in connections
+          - counter += 1;
+          - locStyle = 'default';
           if person.industry
-            if person.industry[0].toLowerCase().indexOf("software") > -1
+            - var industry = person.industry[0].toLowerCase();
+            if industry.indexOf("software") > -1 || industry.indexOf("internet") > -1 || industry.indexOf("tech") > -1 || industry.indexOf("computer") > -1
+              - hits += 1;
+              if person.location[0].name[0].toLowerCase().indexOf("india") > -1
+                - locStyle = 'primary'
               .person.col-xs-4
-                .panel.panel-default.col-xs-12(style="min-height: 170px;")
+                div(style="min-height: 140px;", class="panel panel-#{locStyle}")
+                  .panel-heading
+                    h3.panel-title #{person['first-name']} #{person['last-name']}
                   .panel-body
-                    h3 #{person['first-name']} #{person['last-name']}
                     p #{person.headline}
+    .total-connections.text-center.col-xs-12
+      p: span.label.label-success Found #{hits} out of #{counter} connections

@@ -8,6 +8,8 @@ qs = require 'querystring'
 DB = require 'node-db'
 xml2js = require 'xml2js'
 xml = new xml2js.Parser()
+session = require 'node-session'
+cookieParser = require 'cookie-parser'
 
 dbSettings =
   host: 'ec2-54-221-223-92.compute-1.amazonaws.com'
@@ -97,6 +99,8 @@ dashboard = () ->
     else
       completeLogin res
 
+session.initialize(db)
+
 app
   .use (req, res, next) ->
     req.on 'data', (data) ->
@@ -105,6 +109,8 @@ app
     next()
   .use morgan('short')
   .use quip
+  .use cookieParser('Draco dormiens nunquam titillandus')
+  .use session.handle(dbSettings)
   .use pr.url
   .use '/link', fbLogin()
   .use '/dashboard', dashboard()

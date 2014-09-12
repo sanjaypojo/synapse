@@ -27,7 +27,7 @@ api =
   keySecret: "RbsbfFd6UFtJ25bi"
   callbackURL: encodeURIComponent "http://localhost:3000/link/callback"
   scope: encodeURIComponent 'r_fullprofile r_network'
-  state: 'dracodormeinsnunquamtitilandus'
+  state: 'tinkerTailorSoldierSpy'
   token: null
   authCode: null
 
@@ -59,7 +59,7 @@ fetchToken = (callback) ->
       callback()
 
 completeLogin = (res) ->
-  console.log 'Logging user in'
+  console.log 'Rendering dashboard'
   request
     .get 'https://api.linkedin.com/v1/people/~/connections?oauth2_access_token=' + api.token, (err, response, body) ->
       if err
@@ -99,7 +99,7 @@ dashboard = () ->
     else
       completeLogin res
 
-session.initialize(db)
+session.initialize(db, 'syn_user')
 
 app
   .use (req, res, next) ->
@@ -107,12 +107,14 @@ app
       if data.length > 5*1000000
         req.connection.destroy()
     next()
-  .use morgan('short')
-  .use quip
   .use cookieParser('Draco dormiens nunquam titillandus')
   .use session.handle(dbSettings)
+  .use quip
+  .use '/favicon.ico', (req, res, next) -> res.ok ' '
+  .use morgan('short')
   .use pr.url
+  .use '/login', (req, res, next) -> render.jade res, 'login', {}
+  .use session.authenticate
   .use '/link', fbLogin()
   .use '/dashboard', dashboard()
-  .use (req, res, next) -> render.jade res, 'login', {}
   .listen 3000

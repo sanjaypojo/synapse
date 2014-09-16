@@ -114,7 +114,7 @@ app
   .use morgan('short')
   .use pr.url
   .use '/login', (req, res, next) -> render.jade res, 'login', {}
-  .use session.authenticate
+  # .use session.authenticate
   .use '/link', fbLogin()
   .use '/dashboard', dashboard()
   .listen 3000

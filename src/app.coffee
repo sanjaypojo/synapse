@@ -117,4 +117,5 @@ app
   # .use session.authenticate
   .use '/link', fbLogin()
   .use '/dashboard', dashboard()
+  .use (req, res, next) -> res.redirect '/login'
   .listen 3001

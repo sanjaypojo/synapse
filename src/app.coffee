@@ -25,7 +25,7 @@ db = new DB('pg', dbSettings)
 api =
   key: "752ctmqv621kk5"
   keySecret: "RbsbfFd6UFtJ25bi"
-  callbackURL: encodeURIComponent "http://localhost:3000/link/callback"
+  callbackURL: encodeURIComponent "http://next.twidd.ly/link/callback"
   scope: encodeURIComponent 'r_fullprofile r_network'
   state: 'tinkerTailorSoldierSpy'
   token: null
